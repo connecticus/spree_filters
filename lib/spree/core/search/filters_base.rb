@@ -12,7 +12,7 @@ module Spree
           prepare(params)
         end
 
-        def retrieve_products
+        def retrieve_products(with_pagination = true)
           @products_scope = get_base_scope
           curr_page = page || 1
 
@@ -20,7 +20,8 @@ module Spree
           unless Spree::Config.show_products_without_price
             @products = @products.where("spree_prices.amount BETWEEN #{@properties[:min]} AND #{@properties[:max]} AND spree_prices.amount > 0").where("spree_prices.currency" => current_currency)
           end
-          @products = @products.page(curr_page).per(per_page)
+
+          @products = with_pagination == true ? @products.page(curr_page).per(per_page) : @products
         end
 
         def method_missing(name)
