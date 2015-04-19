@@ -42,6 +42,7 @@ module Spree
           base_scope = base_scope.in_taxon(taxon) unless taxon.blank?
           base_scope = get_products_conditions_for(base_scope, keywords)
           base_scope = add_search_scopes(base_scope)
+          base_scope = add_sort_scope(base_scope)
           base_scope
         end
 
@@ -67,6 +68,18 @@ module Spree
           base_scope
         end
 
+        def add_sort_scope(base_scope)
+          unless @properties[:sort].nil?
+            sort_direction = 'ASC'
+            sort, sort_direction = @properties[:sort].split("_")
+            case sort
+            when sort = 'price'
+              base_scope = base_scope.reorder('').order("spree_prices.amount #{sort_direction}")
+            end
+          end
+          base_scope
+        end
+
           # method should return new scope based on base_scope
           def get_products_conditions_for(base_scope, query)
             unless query.blank?
@@ -79,6 +92,8 @@ module Spree
             unless params[:property_ids].nil?
               @properties[:property_ids]=params[:property_ids] unless params[:property_ids].empty?
             end
+
+            @properties[:sort] = params[:sort]
 
             @properties[:min]= params[:min_price].to_i > 10_000_000 || params[:min_price].to_i <= 0 ? 0 : params[:min_price].to_i
             @properties[:max]= params[:max_price].to_i > 10_000_000 || params[:max_price].to_i <= 0 ? 10_000_000 : params[:max_price].to_i
