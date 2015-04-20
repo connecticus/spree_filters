@@ -73,8 +73,10 @@ module Spree
             sort_direction = 'ASC'
             sort, sort_direction = @properties[:sort].split("_")
             case sort
-            when sort = 'price'
-              base_scope = base_scope.reorder('').order("spree_prices.amount #{sort_direction}")
+              when 'price'
+                base_scope = base_scope.reorder('').order("spree_prices.amount #{sort_direction}")
+              when 'popularity'
+                base_scope = base_scope.reorder('').descend_by_popularity
             end
           end
           base_scope
