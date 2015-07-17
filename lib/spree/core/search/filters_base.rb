@@ -43,6 +43,7 @@ module Spree
           base_scope = get_products_conditions_for(base_scope, keywords)
           base_scope = add_search_scopes(base_scope)
           base_scope = add_sort_scope(base_scope)
+          debugger
           base_scope
         end
 
@@ -69,7 +70,7 @@ module Spree
         end
 
         def add_sort_scope(base_scope)
-          unless @properties[:sort].nil?
+          if @properties[:sort].present?
             sort_direction = 'ASC'
             sort, sort_direction = @properties[:sort].split("_")
             case sort
@@ -78,7 +79,10 @@ module Spree
               when 'popularity'
                 base_scope = base_scope.reorder('').descend_by_popularity
             end
+          else
+            base_scope = base_scope.reorder('').order("spree_products.position ASC")
           end
+
           base_scope
         end
 
